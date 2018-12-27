@@ -7,7 +7,37 @@ import { DragDropContext } from 'react-beautiful-dnd'
 class App extends React.Component {
   state = initialData
   onDragEnd = result => {
-    //To fo
+    const { destination, source, draggableId } = result
+    // check if user canceled drag
+    if (!destination) {
+      return
+    }
+    // check if user dropped item in the same position as it was inistially
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+    //
+    const column = this.state.columns[source.droppableId]
+    const newTaskIds = Array.from(column.taskIds)
+    newTaskIds.splice(source.index, 1)
+    newTaskIds.splice(destination.index, 0, draggableId)
+
+    const newColumn = {
+      ...column,
+      taskIds: newTaskIds
+    }
+
+    const newState = {
+      ...this.state,
+      column: {
+        ...this.state.columns,
+        [newColumn.id]: newColumn
+      }
+    }
+    this.setState(newState)
   }
   render () {
     return (
